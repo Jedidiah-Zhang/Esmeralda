@@ -45,7 +45,6 @@ Thumbs.db
 .*.swp
 
 # Visual Studio generated files
-/Application/.vs
 *.ib_pdb_index
 *.idb
 *.ilk
@@ -61,8 +60,6 @@ Thumbs.db
 *vcxproj.*
 
 # MinGW generated files
-/build-Application-Android_Qt_6_4_2_Clang_x86_64-Debug
-/build-Application-Desktop_Qt_6_4_2_MSVC2019_64bit-Debug
 *.Debug
 *.Release
 
