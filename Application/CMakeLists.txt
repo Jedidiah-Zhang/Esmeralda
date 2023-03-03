@@ -16,9 +16,14 @@ find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Widgets)
 
 set(PROJECT_SOURCES
         main.cpp
+        pushbutton.h
+        pushbutton.cpp
         mainwindow.cpp
         mainwindow.h
+        levelselect.h
+        levelselect.cpp
         mainwindow.ui
+        res.qrc
 )
 
 if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
