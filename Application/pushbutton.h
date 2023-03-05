@@ -11,10 +11,12 @@ public:
 
     void bounce(bool dirction);
 
+protected:
     QString normalImgPath;
     QString pressImgPath;
 
 signals:
+
 
 };
 

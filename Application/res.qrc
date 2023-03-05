@@ -2,5 +2,8 @@
     <qresource prefix="/">
         <file>resources/images/redButton.png</file>
         <file>resources/images/yellowButton.png</file>
+        <file>resources/images/blueButton.png</file>
+        <file>resources/images/startButton.png</file>
+        <file>resources/images/back.png</file>
     </qresource>
 </RCC>

@@ -1,33 +1,32 @@
 #include "mainwindow.h"
 #include "./ui_mainwindow.h"
-#include "pushbutton.h"
 
-#include <QTimer>
+enum {MENU, LEVELSELECT};
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
     , ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
-    this->setFixedSize(500, 800);
+    // this->setFixedSize(500, 800);
 
-    PushButton *levelSelectBtn = new PushButton(QSize(200, 40), ":/resources/images/yellowButton.png");
-    levelSelectBtn->setParent(this);
-    // levelSelectBtn->setText("Select Level");
+    this->menuList = new QStackedWidget(this);
 
-    levelSelectScene = new levelSelect;
+    this->menuScene = new Menu(this);
+    this->levelSelectScene = new levelSelect(this);
 
+    this->menuList->addWidget(menuScene);
+    this->menuList->addWidget(levelSelectScene);
 
-    connect(levelSelectBtn, &PushButton::clicked, this, [=](){
-        levelSelectBtn->bounce(true);
-        levelSelectBtn->bounce(false);
+    setCentralWidget(this->menuList);
 
-        QTimer::singleShot(200, this, [=](){
-            this->hide();
-            levelSelectScene->show();
-        });
+    connect(this->menuScene, &Menu::startButtonClicked, this, [=](){
+        // qDebug() << this->menuList->currentIndex();
+        this->menuList->setCurrentIndex(LEVELSELECT);
     });
-
+    connect(this->levelSelectScene, &levelSelect::backButtonClicked, this, [=](){
+        this->menuList->setCurrentIndex(MENU);
+    });
 }
 
 MainWindow::~MainWindow()

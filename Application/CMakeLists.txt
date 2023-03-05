@@ -20,6 +20,8 @@ set(PROJECT_SOURCES
         pushbutton.cpp
         mainwindow.cpp
         mainwindow.h
+        menu.h
+        menu.cpp
         levelselect.h
         levelselect.cpp
         mainwindow.ui

@@ -1,8 +1,11 @@
 #ifndef MAINWINDOW_H
 #define MAINWINDOW_H
 
-#include <QMainWindow>
+#include "menu.h"
 #include "levelselect.h"
+
+#include <QMainWindow>
+#include <QStackedWidget>
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
@@ -17,8 +20,14 @@ public:
 
     ~MainWindow();
 
-    levelSelect *levelSelectScene = nullptr;
+public slots:
+
+
 private:
     Ui::MainWindow *ui;
+
+    QStackedWidget *menuList = nullptr;
+    Menu *menuScene = nullptr;
+    levelSelect *levelSelectScene = nullptr;
 };
 #endif // MAINWINDOW_H
