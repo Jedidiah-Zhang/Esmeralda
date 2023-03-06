@@ -5,5 +5,6 @@
         <file>resources/images/blueButton.png</file>
         <file>resources/images/startButton.png</file>
         <file>resources/images/back.png</file>
+        <file>resources/images/defaultLevelBackground.png</file>
     </qresource>
 </RCC>

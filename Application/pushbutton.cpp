@@ -14,6 +14,7 @@ PushButton::PushButton(QSize size, QString normalImg, QString pressImg)
     }
 
     this->setFixedSize(size.width(), size.height());
+    // make the button transparent outside the icon.
     this->setStyleSheet("QPushButton{border:0px;}");
     this->setIcon(pix);
     this->setIconSize(size);
@@ -22,6 +23,8 @@ PushButton::PushButton(QSize size, QString normalImg, QString pressImg)
 
 void PushButton::bounce(bool direction)
 {
+    // animation for button been clicked,
+    // direction determines whether the button moves up or down.
     QPropertyAnimation *animation = new QPropertyAnimation(this, "geometry");
     animation->setDuration(200);
     if (direction) {
