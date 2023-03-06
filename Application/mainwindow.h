@@ -22,8 +22,10 @@ public:
 
 public slots:
 
+signals:
 
 private:
+    virtual void resizeEvent(QResizeEvent *) override;
     Ui::MainWindow *ui;
 
     QStackedWidget *menuList = nullptr;

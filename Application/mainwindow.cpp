@@ -29,6 +29,11 @@ MainWindow::MainWindow(QWidget *parent)
     });
 }
 
+void MainWindow::resizeEvent(QResizeEvent *)
+{
+    this->levelSelectScene->resizeWidgets();
+}
+
 MainWindow::~MainWindow()
 {
     delete ui;

@@ -1,52 +1,43 @@
 #include "levelselect.h"
-#include "pushbutton.h"
 
 #include <QTimer>
-#include <QLayout>
-#include <QFrame>
-#include <QScrollArea>
 
 levelSelect::levelSelect(QWidget *parent)
     : QWidget(parent)
 {
 //    this->setFixedSize(500, 800);
 //    this->setWindowTitle("Select Level");
-    this->W_WIDTH = parent->size().width();
-    this->W_HEIGHT = parent->size().height();
-    int columns = 2;
+
+    this->parent = parent;
+    this->columns = 3;
 
     // back button at top left
     PushButton *backBtn = new PushButton(QSize(100, 30), ":/resources/images/back.png");
     backBtn->setParent(this);
     backBtn->move(5, 5);
 
-    QScrollArea *scrollArea = new QScrollArea(this);
-    QFrame *selectGrid = new QFrame(this);
-    QGridLayout *gridLayout = new QGridLayout(this);
+    this->scrollArea = new QScrollArea(this);
+    this->selectGrid = new QFrame(this);
+    this->gridLayout = new QGridLayout(this);
 
-    for (int i = 0; i < 3; i++) {
+    // create buttons
+    for (int i = 0; i < 15; i++) {
         PushButton *button = new PushButton(QSize(200, 200), "://resources/images/defaultLevelBackground.png");
+        this->buttons.push_back(button);
         gridLayout->addWidget(button, i/columns, i%columns, 1, 1);
+        button->setStyleSheet("QPushButton{background-color:gray;"
+                              "color:white;"
+                              "border-radius:10px;"
+                              "border:2px groove gray;"
+                              "border-style:outset;}");
 
         connect(button, &PushButton::clicked, this, [=](){
+            button->bounce(true);
+            button->bounce(false);
+
             qDebug() << "i = " << i;
         });
     }
-
-    gridLayout->setAlignment(Qt::AlignTop);
-    gridLayout->setHorizontalSpacing((W_WIDTH-30-200*columns)/3);
-    gridLayout->setVerticalSpacing(10);
-    gridLayout->setContentsMargins((W_WIDTH-30-200*columns)/3, 10, (W_WIDTH-30-200*columns)/3, 10);
-
-    selectGrid->setLayout(gridLayout);
-    // selectGrid->setFrameShape(QFrame::Box);
-
-    scrollArea->setWidget(selectGrid);
-    scrollArea->move(5, 40);
-    scrollArea->setFixedSize(W_WIDTH-10, W_HEIGHT-50);
-    scrollArea->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOn);
-    scrollArea->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
-
 
     // send signal as back button been clicked
     connect(backBtn, &PushButton::clicked, this, [=](){
@@ -57,4 +48,43 @@ levelSelect::levelSelect(QWidget *parent)
             emit this->backButtonClicked();
         });
     });
+
+    determineGeometry();
+}
+
+void levelSelect::determineGeometry()
+{
+    this->W_WIDTH = this->parent->size().width();
+    this->W_HEIGHT = this->parent->size().height();
+    this->columns = (W_WIDTH-20)/220;
+
+    // rearrange the buttons
+    for (int i = 0; i < this->buttons.length(); i++) {
+        gridLayout->addWidget(buttons[i], i/columns, i%columns, 1, 1);
+    }
+
+    gridLayout->setAlignment(Qt::AlignTop);
+    gridLayout->setHorizontalSpacing((W_WIDTH-30-200*columns)/(columns+1));
+    gridLayout->setVerticalSpacing(10);
+    gridLayout->setContentsMargins((W_WIDTH-30-200*columns)/(columns+1), 10,
+                                   (W_WIDTH-30-200*columns)/(columns+1), 10);
+
+    selectGrid->setLayout(gridLayout);
+    selectGrid->setFixedSize(W_WIDTH-10, (buttons.length()+columns-1)/columns*210+20);
+
+    scrollArea->setWidget(selectGrid);
+    scrollArea->move(5, 40);
+//    qDebug() << W_WIDTH << W_HEIGHT;
+    scrollArea->setFixedSize(W_WIDTH-10, W_HEIGHT-50);
+    scrollArea->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOn);
+    scrollArea->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+//    scrollArea->setBackgroundRole(QPalette::Dark);
+
+}
+
+void levelSelect::resizeWidgets()
+{
+//    qDebug() << "In resizeWidgets";
+    determineGeometry();
+
 }
