@@ -14,7 +14,6 @@ class levelSelect : public QWidget
     Q_OBJECT
 public:
     levelSelect(QWidget *parent = nullptr);
-    void resizeWidgets();
     void determineGeometry();
 
 signals:

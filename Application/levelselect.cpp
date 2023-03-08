@@ -1,6 +1,7 @@
 #include "levelselect.h"
 
 #include <QTimer>
+#include <QImage>
 
 levelSelect::levelSelect(QWidget *parent)
     : QWidget(parent)
@@ -9,16 +10,18 @@ levelSelect::levelSelect(QWidget *parent)
 //    this->setWindowTitle("Select Level");
 
     this->parent = parent;
-    this->columns = 3;
+    this->W_WIDTH = parent->size().width();
+    // determine how many columns able to display in terms of the width of the window.
+    this->columns = (W_WIDTH-20)/220;
+
+    this->scrollArea = new QScrollArea(this);
+    this->selectGrid = new QFrame(this);
+    this->gridLayout = new QGridLayout(this);
 
     // back button at top left
     PushButton *backBtn = new PushButton(QSize(100, 30), ":/resources/images/back.png");
     backBtn->setParent(this);
     backBtn->move(5, 5);
-
-    this->scrollArea = new QScrollArea(this);
-    this->selectGrid = new QFrame(this);
-    this->gridLayout = new QGridLayout(this);
 
     // create buttons
     for (int i = 0; i < 15; i++) {
@@ -63,6 +66,7 @@ void levelSelect::determineGeometry()
         gridLayout->addWidget(buttons[i], i/columns, i%columns, 1, 1);
     }
 
+    // change the spacing as the window size changed
     gridLayout->setAlignment(Qt::AlignTop);
     gridLayout->setHorizontalSpacing((W_WIDTH-30-200*columns)/(columns+1));
     gridLayout->setVerticalSpacing(10);
@@ -70,7 +74,7 @@ void levelSelect::determineGeometry()
                                    (W_WIDTH-30-200*columns)/(columns+1), 10);
 
     selectGrid->setLayout(gridLayout);
-    selectGrid->setFixedSize(W_WIDTH-10, (buttons.length()+columns-1)/columns*210+20);
+    selectGrid->setFixedSize(W_WIDTH-30, (buttons.length()+columns-1)/columns*210+20);
 
     scrollArea->setWidget(selectGrid);
     scrollArea->move(5, 40);
@@ -78,13 +82,9 @@ void levelSelect::determineGeometry()
     scrollArea->setFixedSize(W_WIDTH-10, W_HEIGHT-50);
     scrollArea->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOn);
     scrollArea->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
-//    scrollArea->setBackgroundRole(QPalette::Dark);
-
-}
-
-void levelSelect::resizeWidgets()
-{
-//    qDebug() << "In resizeWidgets";
-    determineGeometry();
-
+    scrollArea->setAutoFillBackground(true);
+    // set background in the selection area
+    QPalette pal(palette());
+    pal.setBrush(QPalette::Window, QBrush(QImage("://resources/images/Bricks.png").scaled(64, 64)));
+    scrollArea->setPalette(pal);
 }

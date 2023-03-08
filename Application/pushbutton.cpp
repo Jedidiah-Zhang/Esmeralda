@@ -18,7 +18,6 @@ PushButton::PushButton(QSize size, QString normalImg, QString pressImg)
     this->setStyleSheet("QPushButton{border:0px;}");
     this->setIcon(pix);
     this->setIconSize(size);
-
 }
 
 void PushButton::bounce(bool direction)
