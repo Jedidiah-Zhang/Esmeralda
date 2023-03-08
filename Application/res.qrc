@@ -7,7 +7,8 @@
         <file>resources/images/back.png</file>
         <file>resources/images/defaultLevelBackground.png</file>
         <file>resources/images/Bricks.png</file>
-        <file>resources/images/Stone.png</file>
+        <file>resources/images/star.png</file>
+        <file>resources/images/star_dark.png</file>
     </qresource>
     <qresource prefix="/font">
         <file>resources/fonts/dearJoe5CASUAL-P.otf</file>

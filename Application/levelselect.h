@@ -18,14 +18,18 @@ public:
 
 signals:
     void backButtonClicked();
+    void levelSelected(int);
 
 private:
-    int W_WIDTH, W_HEIGHT, columns;
+    int W_WIDTH, W_HEIGHT;
+    int columns = 0, levelcount;
     QWidget *parent;
     QScrollArea *scrollArea = nullptr;
     QFrame *selectGrid = nullptr;
     QGridLayout *gridLayout = nullptr;
     QVector<PushButton *> buttons;
+    QVector<QWidget *> stars;
+    QVector<int> starRecords;
 };
 
 #endif // LEVELSELECT_H

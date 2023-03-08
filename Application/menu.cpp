@@ -26,7 +26,7 @@ Menu::Menu(QWidget *parent)
 
     this->leftBtn = new QToolButton(this);
     this->leftBtn->setFont(QFont("Times New Roman", 20));
-    this->leftBtn->setText("PREV\nIOUS");
+    this->leftBtn->setText("PREV");
 
     this->rightBtn = new QToolButton(this);
     this->rightBtn->setFont(QFont("Times New Roman", 20));

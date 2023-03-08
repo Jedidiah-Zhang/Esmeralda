@@ -43,7 +43,7 @@ MainWindow::MainWindow(QWidget *parent)
 }
 
 void MainWindow::changeScene(int idx){
-    qDebug() << idx;
+//    qDebug() << idx;
     this->menuScene->disconnect(SIGNAL(centralBtnClicked()));
     connect(this->menuScene, &Menu::centralBtnClicked, this, [=](){
         this->menuList->setCurrentIndex(SCENES(idx));
