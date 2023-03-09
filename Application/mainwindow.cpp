@@ -6,18 +6,18 @@ MainWindow::MainWindow(QWidget *parent)
     , ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
-//    this->setFixedSize(500, 800);
 
+    // set up all the scenes, and determine which scene is shown.
     // show only one scene at a time.
     this->menuList = new QStackedWidget(this);
 
-    //note that the order of scenes added to menuList is the same as the enum
+    //note that the order of scenes added to menuList is the same as the enum SCENES
     this->levelSelectScene = new levelSelect(this);
-    this->minigameScene = new QWidget(this);
-    this->designScene = new QWidget(this);
-    this->progressScene = new QWidget(this);
+    this->minigameScene = new Games(this);
+    this->designScene = new Design(this);
+    this->progressScene = new Progress(this);
     this->menuScene = new Menu(this);
-    this->buildScene = new QWidget(this);
+    this->buildScene = new Build(this);
 
     this->menuList->addWidget(this->levelSelectScene);
     this->menuList->addWidget(this->minigameScene);
@@ -26,9 +26,10 @@ MainWindow::MainWindow(QWidget *parent)
     this->menuList->addWidget(this->menuScene);
     this->menuList->addWidget(this->buildScene);
 
-    setCentralWidget(this->menuList);
     this->menuList->setCurrentIndex(MENU);
+    setCentralWidget(this->menuList);
 
+    /*==========Connections==========*/
     // menu scene
     connect(this->menuScene, SIGNAL(leftBtnClicked(int)), this, SLOT(changeScene(int)));
     connect(this->menuScene, SIGNAL(rightBtnClicked(int)), this, SLOT(changeScene(int)));
@@ -40,9 +41,17 @@ MainWindow::MainWindow(QWidget *parent)
     connect(this->levelSelectScene, &levelSelect::backButtonClicked, this, [=](){
         this->menuList->setCurrentIndex(MENU);
     });
+    connect(this->levelSelectScene, SIGNAL(levelSelected(int)), this, SLOT(toBuildScene(int)));
+
+    // build scene
+    connect(this->buildScene, &Build::backButtonClicked, this, [=](){
+        this->menuList->setCurrentIndex(LEVELSELECT);
+    });
 }
 
-void MainWindow::changeScene(int idx){
+// switch the function of the central button
+void MainWindow::changeScene(int idx)
+{
 //    qDebug() << idx;
     this->menuScene->disconnect(SIGNAL(centralBtnClicked()));
     connect(this->menuScene, &Menu::centralBtnClicked, this, [=](){
@@ -50,6 +59,15 @@ void MainWindow::changeScene(int idx){
     });
 }
 
+// switch to build scene, with specified level
+void MainWindow::toBuildScene(int lvl)
+{
+    this->menuList->setCurrentIndex(BUILD);
+    this->buildScene->setLevel(lvl);
+}
+
+// tell every scene that the window size is changed
+// hence to rearrange widgets on them
 void MainWindow::resizeEvent(QResizeEvent *)
 {
     this->menuScene->determineGeometry();

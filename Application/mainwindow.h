@@ -3,6 +3,10 @@
 
 #include "menu.h"
 #include "levelselect.h"
+#include "build.h"
+#include "design.h"
+#include "games.h"
+#include "progress.h"
 
 #include <QMainWindow>
 #include <QStackedWidget>
@@ -31,6 +35,7 @@ public:
 
 public slots:
     void changeScene(int idx);
+    void toBuildScene(int lvl);
 
 signals:
 
@@ -41,9 +46,9 @@ private:
     QStackedWidget *menuList = nullptr;
     Menu *menuScene = nullptr;
     levelSelect *levelSelectScene = nullptr;
-    QWidget *minigameScene = nullptr;
-    QWidget *designScene = nullptr;
-    QWidget *progressScene = nullptr;
-    QWidget *buildScene = nullptr;
+    Games *minigameScene = nullptr;
+    Design *designScene = nullptr;
+    Progress *progressScene = nullptr;
+    Build *buildScene = nullptr;
 };
 #endif // MAINWINDOW_H

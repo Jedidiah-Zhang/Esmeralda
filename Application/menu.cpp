@@ -2,6 +2,8 @@
 
 #include <QTimer>
 
+// these options should be the same order as enum SCENES
+// otherwise the index won't match
 const QVector<QString> Menu::menuOptions = {"START", "MINIGAMES", "DESIGN", "PROGRESS"};
 
 Menu::Menu(QWidget *parent)
@@ -38,6 +40,11 @@ Menu::Menu(QWidget *parent)
 
     connect(this->leftBtn, &QToolButton::clicked, this, &Menu::shiftLeft);
     connect(this->rightBtn, &QToolButton::clicked, this, &Menu::shiftRight);
+
+    // keyboard binding
+    this->CentralBtn->setShortcut(Qt::Key_Return);
+    this->leftBtn->setShortcut(Qt::Key_Left);
+    this->rightBtn->setShortcut(Qt::Key_Right);
 
     determineGeometry();
 }

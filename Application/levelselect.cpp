@@ -81,6 +81,9 @@ levelSelect::levelSelect(QWidget *parent)
         });
     });
 
+    // keyboard binding
+    backBtn->setShortcut(Qt::Key_Escape);
+
     determineGeometry();
 }
 

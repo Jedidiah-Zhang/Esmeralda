@@ -24,6 +24,14 @@ set(PROJECT_SOURCES
         menu.cpp
         levelselect.h
         levelselect.cpp
+        build.h
+        build.cpp
+        design.h
+        design.cpp
+        games.h
+        games.cpp
+        progress.h
+        progress.cpp
         mainwindow.ui
         res.qrc
 )
