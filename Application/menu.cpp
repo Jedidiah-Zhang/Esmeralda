@@ -34,9 +34,7 @@ Menu::Menu(QWidget *parent)
     this->rightBtn->setFont(QFont("Times New Roman", 20));
     this->rightBtn->setText("NEXT");
 
-    connect(CentralBtn, &QToolButton::clicked, this, [=](){
-        emit this->centralBtnClicked();
-    });
+    connect(CentralBtn, &QToolButton::clicked, this, &Menu::centralBtnClicked);
 
     connect(this->leftBtn, &QToolButton::clicked, this, &Menu::shiftLeft);
     connect(this->rightBtn, &QToolButton::clicked, this, &Menu::shiftRight);
