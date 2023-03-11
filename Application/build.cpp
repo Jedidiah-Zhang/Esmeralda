@@ -1,11 +1,17 @@
 #include "build.h"
 
 #include <QLayout>
-
+#include <QMessageBox>
+#include <QDateTime>
 
 Build::Build(QWidget *parent)
     : QWidget{parent}
 {
+    QPalette pal(this->palette());
+    pal.setColor(QPalette::Window, QColor(224, 223, 198)); // #E0DFC6
+    this->setAutoFillBackground(true);
+    this->setPalette(pal);
+
     // back button at top left
     PushButton *backBtn = new PushButton(QSize(100, 30), ":/resources/images/back.png");
     backBtn->setParent(this);
@@ -37,8 +43,28 @@ Build::Build(QWidget *parent)
         backBtn->bounce(false);
 
         QTimer::singleShot(100, this, [=](){
-            emit this->backButtonClicked();
-            resetTiming();
+            if (this->timer->isActive()) {
+                pauseTiming();
+                QMessageBox msg;
+                msg.setText("The building is not finished, and the progress will not be saved.");
+                msg.setInformativeText("Do you want to quit?");
+                msg.setStandardButtons(QMessageBox::Yes | QMessageBox::Cancel);
+                msg.setDefaultButton(QMessageBox::Cancel);
+                switch (msg.exec()) {
+                    case QMessageBox::Yes:
+                        resetTiming();
+                        emit this->backButtonClicked();
+                        break;
+                    case QMessageBox::Cancel:
+                        startTiming();
+                        break;
+                    default:
+                        break;
+                }
+            } else {
+                resetTiming();
+                emit this->backButtonClicked();
+            }
         });
     });
 
@@ -62,19 +88,31 @@ void Build::setLevel(int lvl)
     this->levelIdx = lvl;
 }
 
+void Build::success()
+{
+    QDateTime curDateTime = QDateTime::currentDateTime();
+    int time = curDateTime.toSecsSinceEpoch();
+    emit updateRecordFilesReady(this->levelIdx, time, this->timeTaken, this->attempts);
+
+    pauseTiming();
+}
+
 void Build::startTiming()
 {
     this->timer->start(10);
+    this->tmLbl->setStyleSheet("QLabel{color:#ED6D46;}");
 }
 
 void Build::pauseTiming()
 {
     this->timer->stop();
+    this->tmLbl->setStyleSheet("QLabel{color:black;}");
 }
 void Build::resetTiming()
 {
     this->timer->stop();
     this->timeTaken = 0;
+    this->tmLbl->setStyleSheet("QLabel{color:black;}");
     this->startBtn->show();
     updateTime();
 }
@@ -98,5 +136,12 @@ void Build::updateTime()
                    .arg(sec, 2, 10, QLatin1Char('0')) \
                    .arg(mil, 2, 10, QLatin1Char('0'));
     this->tmLbl->setText(time);
+}
+
+void Build::keyPressEvent(QKeyEvent *event)
+{
+    if (event->key() == Qt::Key_V) {
+        success();
+    }
 }
 

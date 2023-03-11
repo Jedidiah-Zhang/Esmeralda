@@ -1,11 +1,19 @@
 #include "mainwindow.h"
 #include "./ui_mainwindow.h"
 
+#include <QDir>
+#include <QJsonObject>
+#include <QJsonDocument>
+#include <QJsonParseError>
+#include <QJsonValue>
+#include <QJsonArray>
+
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
     , ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
+    this->setWindowIcon(QIcon("://resources/images/blocks_icon.png"));
 
     // set up all the scenes, and determine which scene is shown.
     // show only one scene at a time.
@@ -47,6 +55,20 @@ MainWindow::MainWindow(QWidget *parent)
     connect(this->buildScene, &Build::backButtonClicked, this, [=](){
         this->menuList->setCurrentIndex(LEVELSELECT);
     });
+    connect(this->buildScene, &Build::updateRecordFilesReady, this, &MainWindow::updateRecordFiles);
+
+    /*==========FileReading==========*/
+    // load records
+    this->records = new QMap<int, QVector<Record> *>;
+    QDir dir("../Application/records/");
+    dir.setFilter(QDir::Files | QDir::NoSymLinks);
+    QFileInfoList list = dir.entryInfoList();
+    // go through every file
+    for(int i = 0; i < list.count(); i++) {
+        QFileInfo info = list.at(i);
+        QFile file(info.absoluteFilePath());
+        readRecordFile(info.absoluteFilePath(), info.baseName());
+    }
 }
 
 // switch the function of the central button
@@ -72,6 +94,69 @@ void MainWindow::resizeEvent(QResizeEvent *)
 {
     this->menuScene->determineGeometry();
     this->levelSelectScene->determineGeometry();
+}
+
+void MainWindow::readRecordFile(QString fileDir, QString level)
+{
+    QFile file(fileDir);
+    file.open(QIODevice::ReadOnly);
+    QByteArray data = file.readAll();
+    file.close();
+
+    QJsonParseError parseError;
+    QJsonDocument doc = QJsonDocument::fromJson(data, &parseError);
+    if (parseError.error != QJsonParseError::NoError)
+        qDebug() << "error: " << parseError.error;
+    QJsonObject obj = doc.object();
+    if (obj.contains(level)) {
+        QJsonArray array = obj.value(level).toArray();
+        QVector<Record> * singleLevelRecord = new QVector<Record>;
+        for (int j = 0; j < array.size(); j++) {
+            QJsonObject subObj = array.at(j).toObject();
+            Record record;
+            record.startTime = subObj.value("startTime").toInt();
+            record.timeUsed = subObj.value("timeUsed").toInt();
+            record.attempts = subObj.value("attempts").toInt();
+            singleLevelRecord->push_back(record);
+        }
+        this->records->insert(level.toInt(), singleLevelRecord);
+    }
+}
+
+void MainWindow::updateRecordFiles(int idx, int curT, int useT, int Att)
+{
+    QVector<Record> *singleLevelRecord;
+    Record record;
+    record.timeUsed = useT;
+    record.startTime = curT;
+    record.attempts = Att;
+    if (this->records->value(idx) == nullptr)
+        singleLevelRecord = new QVector<Record>;
+    else singleLevelRecord = this->records->value(idx);
+    singleLevelRecord->push_back(record);
+
+    QJsonObject obj;
+    QJsonArray array;
+    for (int i = 0; i < singleLevelRecord->size(); i++) {
+        QJsonObject sub;
+        sub.insert("startTime", singleLevelRecord->at(i).startTime);
+        sub.insert("timeUsed", singleLevelRecord->at(i).timeUsed);
+        sub.insert("attempts", singleLevelRecord->at(i).attempts);
+        array.append(QJsonValue(sub));
+    }
+    obj.insert(QString("%1").arg(idx), QJsonValue(array));
+
+    QJsonDocument doc(obj);
+    QByteArray data = doc.toJson();
+    QDir dir = QDir("../Application/records/");
+    if (!dir.exists()) dir.mkpath(".");
+    QFile file(QString("%1/%2.json").arg(dir.absolutePath()).arg(idx));
+    if (file.open(QIODevice::WriteOnly | QIODevice::Truncate)) {
+        file.write(data);
+        file.close();
+    } else {
+        qDebug() << "Write error" << file.errorString();
+    }
 }
 
 MainWindow::~MainWindow()

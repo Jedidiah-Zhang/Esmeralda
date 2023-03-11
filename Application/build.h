@@ -6,6 +6,7 @@
 #include <QWidget>
 #include <QLabel>
 #include <QTimer>
+#include <QKeyEvent>
 
 class Build : public QWidget
 {
@@ -20,15 +21,19 @@ public:
 
 signals:
     void backButtonClicked();
+    void updateRecordFilesReady(int idx, int curT, int useT, int Att);
 
 public slots:
     void timeInc();
+    void success();
 
 private:
     void updateTime();
+    void keyPressEvent(QKeyEvent *event) override;
 
     int levelIdx = 0;
     int timeTaken = 0;
+    int attempts = 1;
 
     QLabel *tmLbl = nullptr;
     QTimer *timer = nullptr;

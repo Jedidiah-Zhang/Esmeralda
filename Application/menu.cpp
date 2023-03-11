@@ -14,10 +14,15 @@ Menu::Menu(QWidget *parent)
     this->W_HEIGHT = parent->height();
     this->currentBtnIdx = 0;
 
+    QPalette pal(this->palette());
+    pal.setColor(QPalette::Window, QColor(224, 223, 198)); // #E0DFC6
+    this->setAutoFillBackground(true);
+    this->setPalette(pal);
+
     this->CentralBtn = new QToolButton(this);
     this->CentralBtn->setStyleSheet("QToolButton{"
-                                    "background-color:#a9abaf;"
-                                    "color:white;"
+                                    "background-color:#ED6D46;"
+                                    "color:#E0DFC6;"
                                     "font:bold;"
                                     "border-radius:20px;"
                                     "border:2px groove gray;"
@@ -58,8 +63,8 @@ void Menu::determineGeometry()
     this->leftBtn->setFixedSize(W_WIDTH/4, W_HEIGHT/3);
     this->leftBtn->move(-W_WIDTH/8, W_HEIGHT/3);
     this->leftBtn->setStyleSheet(QString("QToolButton{"
-                                         "background-color:#a9abaf;"
-                                         "color:white;"
+                                         "background-color:#ED6D46;"
+                                         "color:#E0DFC6;"
                                          "border-radius:20px;"
                                          "border:2px groove gray;"
                                          "border-style:outset;"
@@ -69,8 +74,8 @@ void Menu::determineGeometry()
     this->rightBtn->setFixedSize(W_WIDTH/4, W_HEIGHT/3);
     this->rightBtn->move(7*W_WIDTH/8, W_HEIGHT/3);
     this->rightBtn->setStyleSheet(QString("QToolButton{"
-                                          "background-color:#a9abaf;"
-                                          "color:white;"
+                                          "background-color:#ED6D46;"
+                                          "color:#E0DFC6;"
                                           "border-radius:20px;"
                                           "border:2px groove gray;"
                                           "border-style:outset;"

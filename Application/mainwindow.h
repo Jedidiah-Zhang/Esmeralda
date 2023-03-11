@@ -10,6 +10,7 @@
 
 #include <QMainWindow>
 #include <QStackedWidget>
+#include <QVector>
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
@@ -24,6 +25,12 @@ enum SCENES{
     BUILD
 };
 
+typedef struct Record {
+    int startTime;
+    int timeUsed;
+    int attempts;
+} Record;
+
 class MainWindow : public QMainWindow
 {
     Q_OBJECT
@@ -31,16 +38,20 @@ class MainWindow : public QMainWindow
 public:
     MainWindow(QWidget *parent = nullptr);
 
+    void readRecordFile(QString fileDir, QString level);
+
     ~MainWindow();
 
 public slots:
     void changeScene(int idx);
     void toBuildScene(int lvl);
+    void updateRecordFiles(int idx, int curT, int useT, int Att);
 
 signals:
 
 private:
     virtual void resizeEvent(QResizeEvent *) override;
+
     Ui::MainWindow *ui;
 
     QStackedWidget *menuList = nullptr;
@@ -50,5 +61,7 @@ private:
     Design *designScene = nullptr;
     Progress *progressScene = nullptr;
     Build *buildScene = nullptr;
+
+    QMap<int, QVector<Record> *> *records;
 };
 #endif // MAINWINDOW_H
