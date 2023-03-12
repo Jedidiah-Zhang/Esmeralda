@@ -94,7 +94,8 @@ void Build::success()
     int time = curDateTime.toSecsSinceEpoch();
     emit updateRecordFilesReady(this->levelIdx, time, this->timeTaken, this->attempts);
 
-    pauseTiming();
+    emit this->backButtonClicked();
+    resetTiming();
 }
 
 void Build::startTiming()

@@ -16,6 +16,9 @@ public:
     levelSelect(QWidget *parent = nullptr);
     void determineGeometry();
 
+public slots:
+    void setStarRecords(int idx, int stars);
+
 signals:
     void backButtonClicked();
     void levelSelected(int);

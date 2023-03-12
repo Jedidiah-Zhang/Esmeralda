@@ -98,6 +98,8 @@ void MainWindow::resizeEvent(QResizeEvent *)
 
 void MainWindow::readRecordFile(QString fileDir, QString level)
 {
+    int minTime = INT_MAX;
+
     QFile file(fileDir);
     file.open(QIODevice::ReadOnly);
     QByteArray data = file.readAll();
@@ -118,8 +120,12 @@ void MainWindow::readRecordFile(QString fileDir, QString level)
             record.timeUsed = subObj.value("timeUsed").toInt();
             record.attempts = subObj.value("attempts").toInt();
             singleLevelRecord->push_back(record);
+
+            minTime = minTime < record.timeUsed ? minTime : record.timeUsed;
         }
         this->records->insert(level.toInt(), singleLevelRecord);
+
+        this->levelSelectScene->setStarRecords(level.toInt(), minTime);
     }
 }
 
@@ -157,6 +163,7 @@ void MainWindow::updateRecordFiles(int idx, int curT, int useT, int Att)
     } else {
         qDebug() << "Write error" << file.errorString();
     }
+    this->levelSelectScene->setStarRecords(idx, useT);
 }
 
 MainWindow::~MainWindow()
