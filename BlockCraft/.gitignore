@@ -34,10 +34,10 @@ Thumbs.db
 *.rc
 /.qmake.cache
 /.qmake.stash
-/build-BlockCraft-Desktop_Qt_6_4_2_MSVC2019_64bit-Debug
 
 # qtcreator generated files
 *.pro.user*
+CMakeLists.txt.user*
 
 # xemacs temporary files
 *.flc
@@ -46,7 +46,6 @@ Thumbs.db
 .*.swp
 
 # Visual Studio generated files
-/Application/.vs
 *.ib_pdb_index
 *.idb
 *.ilk

@@ -12,6 +12,15 @@
 #include <QStackedWidget>
 #include <QVector>
 
+#include <QBluetoothDeviceInfo>
+#include <QBluetoothLocalDevice>
+#include <qbluetoothdevicediscoveryagent.h>
+#include <QBluetoothSocket>
+#include <QBluetoothUuid>
+#include <QBluetoothAddress>
+
+#include <bitset>
+
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
 QT_END_NAMESPACE
@@ -31,6 +40,16 @@ typedef struct Record {
     int attempts;
 } Record;
 
+enum COMMANDS {
+
+};
+
+typedef struct Package {
+    std::bitset<4> cmd;
+    int lengh;
+
+} Package;
+
 class MainWindow : public QMainWindow
 {
     Q_OBJECT
@@ -46,6 +65,13 @@ public slots:
     void changeScene(int idx);
     void toBuildScene(int lvl);
     void updateRecordFiles(int idx, int curT, int useT, int Att);
+
+private slots:
+    void discoverBlueTooth(QBluetoothDeviceInfo info);
+    void scanFinished();
+    void readBluetoothData();
+    void sendBluetoothData();
+    void bluetoothConnected();
 
 signals:
 
@@ -63,5 +89,9 @@ private:
     Build *buildScene = nullptr;
 
     QMap<int, QVector<Record> *> *records;
+
+    QBluetoothLocalDevice *localDevice;
+    QString BTaddress;
+    QBluetoothSocket *socket;
 };
 #endif // MAINWINDOW_H

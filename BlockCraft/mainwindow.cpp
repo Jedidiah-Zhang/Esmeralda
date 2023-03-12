@@ -69,6 +69,15 @@ MainWindow::MainWindow(QWidget *parent)
         QFile file(info.absoluteFilePath());
         readRecordFile(info.absoluteFilePath(), info.baseName());
     }
+
+    /*==========BlueTooth==========*/
+    QBluetoothDeviceDiscoveryAgent *discoveryAgent = new QBluetoothDeviceDiscoveryAgent(this);
+    discoveryAgent->setLowEnergyDiscoveryTimeout(15000);
+    connect(discoveryAgent, SIGNAL(deviceDiscovered(QBluetoothDeviceInfo)),
+            this, SLOT(discoverBlueTooth(QBluetoothDeviceInfo)));
+    connect(discoveryAgent, SIGNAL(finished()), this, SLOT(scanFinished()));
+    discoveryAgent->start();
+
 }
 
 // switch the function of the central button
@@ -164,6 +173,43 @@ void MainWindow::updateRecordFiles(int idx, int curT, int useT, int Att)
         qDebug() << "Write error" << file.errorString();
     }
     this->levelSelectScene->setStarRecords(idx, useT);
+}
+
+void MainWindow::discoverBlueTooth(QBluetoothDeviceInfo info)
+{
+    QString label = QString("%1 %2").arg(info.address().toString(), info.name());
+    if (info.name() == "HC-05") this->BTaddress = info.address().toString();
+    qDebug() << label;
+}
+
+void MainWindow::scanFinished()
+{
+    qDebug() << "Scan Finished";
+    static QString serviceUuid("00001101-0000-1000-8000-00805F9B34FB");
+    this->socket = new QBluetoothSocket(QBluetoothServiceInfo::RfcommProtocol);
+    this->socket->connectToService(QBluetoothAddress(this->BTaddress), QBluetoothUuid(serviceUuid),QIODevice::ReadWrite);
+    connect(socket,SIGNAL(readyRead()), this, SLOT(readBluetoothData()));
+    connect(socket,SIGNAL(connected()), this, SLOT(bluetoothConnected()));
+}
+
+void MainWindow::readBluetoothData()
+{
+    char data[100];
+    qint64 len = socket->read((char *)data, 100);
+
+    QByteArray qa2((char*)data,len);
+    QString qstr(qa2.toHex());
+    qDebug()<<"----" << qstr;
+}
+
+void MainWindow::sendBluetoothData()
+{
+
+}
+
+void MainWindow::bluetoothConnected()
+{
+    qDebug() << "Bluetooth Connected.";
 }
 
 MainWindow::~MainWindow()

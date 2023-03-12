@@ -129,11 +129,9 @@ void levelSelect::setStarRecords(int idx, int time)
     layout->setAlignment(Qt::AlignCenter);
     for (int j = 0; j < 3; j++) {
         QLabel *singleStar = new QLabel(this->scrollArea);
-        if (j >= starRecords[idx]) {
+        if (j >= starRecords[idx])
             singleStar->setPixmap(QPixmap("://resources/images/star_dark.png").scaled(35, 35));
-        } else {
-            singleStar->setPixmap(QPixmap("://resources/images/star.png").scaled(35, 35));
-        }
+        else singleStar->setPixmap(QPixmap("://resources/images/star.png").scaled(35, 35));
         layout->addWidget(singleStar);
     }
     this->stars[idx]->setLayout(layout);
