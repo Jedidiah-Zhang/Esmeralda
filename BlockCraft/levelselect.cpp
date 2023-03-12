@@ -10,10 +10,10 @@ levelSelect::levelSelect(QWidget *parent)
     this->parent = parent;
     this->W_WIDTH = parent->size().width();
 
-    this->levelcount = 15;
-    for (int i = 0; i < levelcount; i++) {
-        this->starRecords.push_back(4);
-    }
+    QPalette pal(this->palette());
+    pal.setColor(QPalette::Window, QColor(224, 223, 198)); // #E0DFC6
+    this->setAutoFillBackground(true);
+    this->setPalette(pal);
 
     this->scrollArea = new QScrollArea(this);
     this->selectGrid = new QFrame(this->scrollArea);
@@ -23,37 +23,6 @@ levelSelect::levelSelect(QWidget *parent)
     PushButton *backBtn = new PushButton(QSize(100, 30), ":/resources/images/back.png");
     backBtn->setParent(this);
     backBtn->move(5, 5);
-
-    // create buttons
-    for (int i = 0; i < levelcount; i++) {
-        PushButton *button = new PushButton(QSize(200, 200), "://resources/images/defaultLevelBackground.png");
-        button->setParent(this->scrollArea);
-        button->setStyleSheet("QPushButton{background-color:gray;"
-                              "color:white;"
-                              "border-radius:10px;"
-                              "border:2px groove gray;"
-                              "border-style:outset;}");
-        this->buttons.push_back(button);
-
-        connect(button, &PushButton::clicked, this, [=](){
-//            qDebug() << "i = " << i;
-            button->bounce(true);
-            button->bounce(false);
-
-            QTimer::singleShot(100, this, [=](){
-                emit this->levelSelected(i);
-            });
-        });
-    }
-
-    //star labels
-    for (int i = 0; i < levelcount; i++) {
-        QWidget *star = new QWidget(this->scrollArea);
-        //
-        star->setFixedSize(130, 50);
-        star->setAttribute(Qt::WA_TransparentForMouseEvents, true);
-        this->stars.push_back(star);
-    }
 
     // send signal as back button been clicked
     connect(backBtn, &PushButton::clicked, this, [=](){
@@ -67,8 +36,6 @@ levelSelect::levelSelect(QWidget *parent)
 
     // keyboard binding
     backBtn->setShortcut(Qt::Key_Escape);
-
-    determineGeometry();
 }
 
 void levelSelect::determineGeometry()
@@ -108,8 +75,50 @@ void levelSelect::determineGeometry()
     scrollArea->setPalette(pal);
 }
 
+void levelSelect::setLevels(int levelCount)
+{
+    this->levelcount = levelCount;
+    for (int i = 0; i < this->levelcount; i++) {
+        this->starRecords.push_back(4);
+    }
+
+    // create buttons
+    for (int i = 0; i < levelcount; i++) {
+        PushButton *button = new PushButton(QSize(200, 200), "://resources/images/defaultLevelBackground.png");
+        button->setParent(this->scrollArea);
+        button->setStyleSheet("QPushButton{background-color:gray;"
+                              "color:white;"
+                              "border-radius:10px;"
+                              "border:2px groove gray;"
+                              "border-style:outset;}");
+        this->buttons.push_back(button);
+
+        connect(button, &PushButton::clicked, this, [=](){
+//            qDebug() << "i = " << i;
+            button->bounce(true);
+            button->bounce(false);
+
+            QTimer::singleShot(100, this, [=](){
+                emit this->levelSelected(i);
+            });
+        });
+    }
+
+    //star labels
+    for (int i = 0; i < levelcount; i++) {
+        QWidget *star = new QWidget(this->scrollArea);
+        //
+        star->setFixedSize(130, 50);
+        star->setAttribute(Qt::WA_TransparentForMouseEvents, true);
+        this->stars.push_back(star);
+    }
+
+    determineGeometry();
+}
+
 void levelSelect::setStarRecords(int idx, int time)
 {
+    if (idx > this->levelcount) return;
     if (time > 60000) this->starRecords[idx] = 0;
     else if (time <= 60000 && time > 30000) this->starRecords[idx] = 1;
     else if (time <= 30000 && time > 12000) this->starRecords[idx] = 2;

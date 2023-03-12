@@ -109,6 +109,7 @@ void Build::pauseTiming()
     this->timer->stop();
     this->tmLbl->setStyleSheet("QLabel{color:black;}");
 }
+
 void Build::resetTiming()
 {
     this->timer->stop();

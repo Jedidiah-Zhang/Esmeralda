@@ -17,6 +17,7 @@ public:
     void determineGeometry();
 
 public slots:
+    void setLevels(int levelCount);
     void setStarRecords(int idx, int stars);
 
 signals:
@@ -25,7 +26,7 @@ signals:
 
 private:
     int W_WIDTH, W_HEIGHT;
-    int columns = 0, levelcount;
+    int columns = 0, levelcount = 0;
     QWidget *parent;
     QScrollArea *scrollArea = nullptr;
     QFrame *selectGrid = nullptr;

@@ -11,7 +11,7 @@ public:
     explicit Progress(QWidget *parent = nullptr);
 
 signals:
-
+    void backButtonClicked();
 };
 
 #endif // PROGRESS_H

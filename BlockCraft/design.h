@@ -10,6 +10,7 @@ public:
     explicit Design(QWidget *parent = nullptr);
 
 signals:
+    void backButtonClicked();
 
 };
 

@@ -10,6 +10,7 @@ public:
     explicit Games(QWidget *parent = nullptr);
 
 signals:
+    void backButtonClicked();
 
 };
 

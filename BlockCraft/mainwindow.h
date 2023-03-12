@@ -19,8 +19,6 @@
 #include <QBluetoothUuid>
 #include <QBluetoothAddress>
 
-#include <bitset>
-
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
 QT_END_NAMESPACE
@@ -34,6 +32,14 @@ enum SCENES{
     BUILD
 };
 
+typedef struct Block {
+    int ID;
+    int x;
+    int y;
+    int z;
+    int rot;
+} Block;
+
 typedef struct Record {
     int startTime;
     int timeUsed;
@@ -41,13 +47,15 @@ typedef struct Record {
 } Record;
 
 enum COMMANDS {
-
+    BLOCKS,
+    BUTTON,
+    AUDIO,
+    LED
 };
 
 typedef struct Package {
-    std::bitset<4> cmd;
-    int lengh;
-
+    int cmd;
+    QByteArray *data;
 } Package;
 
 class MainWindow : public QMainWindow
@@ -58,6 +66,7 @@ public:
     MainWindow(QWidget *parent = nullptr);
 
     void readRecordFile(QString fileDir, QString level);
+    void readLevelFile(QString fileDir, QString level);
 
     ~MainWindow();
 
@@ -70,7 +79,7 @@ private slots:
     void discoverBlueTooth(QBluetoothDeviceInfo info);
     void scanFinished();
     void readBluetoothData();
-    void sendBluetoothData();
+    void sendBluetoothData(Package package);
     void bluetoothConnected();
 
 signals:
@@ -89,6 +98,7 @@ private:
     Build *buildScene = nullptr;
 
     QMap<int, QVector<Record> *> *records;
+    QMap<int, QVector<Block> *> *levels;
 
     QBluetoothLocalDevice *localDevice;
     QString BTaddress;
