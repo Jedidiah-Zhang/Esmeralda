@@ -1,6 +1,7 @@
 #include "menu.h"
 
 #include <QTimer>
+#include <QLayout>
 
 // these options should be the same order as enum SCENES
 // otherwise the index won't match
@@ -18,6 +19,20 @@ Menu::Menu(QWidget *parent)
     pal.setColor(QPalette::Window, QColor(224, 223, 198)); // #E0DFC6
     this->setAutoFillBackground(true);
     this->setPalette(pal);
+
+    this->BTInfo = new QWidget(this);
+    QLabel *BTPic = new QLabel(BTInfo);
+    BTPic->setPixmap(QPixmap("://resources/images/bluetooth.png").scaled(QSize(30, 30)));
+    this->BTLabel = new QLabel(BTInfo);
+    BTLabel->setText("Bluetooth");
+    BTLabel->setFont(QFont("Calibri", 16));
+
+    QHBoxLayout *layout = new QHBoxLayout(BTInfo);
+    layout->addWidget(BTPic);
+    layout->addWidget(BTLabel);
+    layout->setAlignment(Qt::AlignLeft);
+    BTInfo->setLayout(layout);
+    BTInfo->setFixedSize(200, 50);
 
     this->CentralBtn = new QToolButton(this);
     this->CentralBtn->setStyleSheet("QToolButton{"
@@ -103,4 +118,21 @@ void Menu::shiftRight()
     }
     this->CentralBtn->setText(menuOptions[this->currentBtnIdx]);
     emit rightBtnClicked(currentBtnIdx);
+}
+
+void Menu::BTSearching()
+{
+    this->BTLabel->setText("Searching...");
+    this->BTLabel->setStyleSheet("color: red");
+}
+
+void Menu::BTConnected()
+{
+    this->BTLabel->setText("Connected!");
+    this->BTLabel->setStyleSheet("color: blue");
+
+
+    QTimer::singleShot(3000, this, [=](){
+        this->BTInfo->setVisible(false);
+    });
 }

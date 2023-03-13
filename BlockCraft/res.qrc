@@ -10,6 +10,7 @@
         <file>resources/images/star.png</file>
         <file>resources/images/star_dark.png</file>
         <file>resources/images/blocks_icon.png</file>
+        <file>resources/images/bluetooth.png</file>
     </qresource>
     <qresource prefix="/font">
         <file>resources/fonts/dearJoe5CASUAL-P.otf</file>

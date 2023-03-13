@@ -73,6 +73,7 @@ public:
 public slots:
     void changeScene(int idx);
     void toBuildScene(int lvl);
+//    void passLevelData(int lvl);
     void updateRecordFiles(int idx, int curT, int useT, int Att);
 
 private slots:
@@ -85,6 +86,8 @@ private slots:
 signals:
 
 private:
+//    void setAverageChart();
+
     virtual void resizeEvent(QResizeEvent *) override;
 
     Ui::MainWindow *ui;

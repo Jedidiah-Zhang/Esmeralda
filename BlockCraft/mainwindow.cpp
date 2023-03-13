@@ -72,6 +72,7 @@ MainWindow::MainWindow(QWidget *parent)
     connect(this->progressScene, &Progress::backButtonClicked, this, [=](){
         this->menuList->setCurrentIndex(MENU);
     });
+//    connect(this->progressScene, SIGNAL(requestLevelData(int)), this, SLOT(passLevelData(int)));
 
     /*==========FileReading==========*/
     // load levels
@@ -88,6 +89,7 @@ MainWindow::MainWindow(QWidget *parent)
 
     // load records
     this->records = new QMap<int, QVector<Record> *>;
+//    QVector<int> *idxs = new QVector<int>;
     QDir dirRecord("../BlockCraft/records/");
     dirRecord.setFilter(QDir::Files | QDir::NoSymLinks);
     QFileInfoList rcdList = dirRecord.entryInfoList();
@@ -96,7 +98,10 @@ MainWindow::MainWindow(QWidget *parent)
         QFileInfo info = rcdList.at(i);
         QFile file(info.absoluteFilePath());
         readRecordFile(info.absoluteFilePath(), info.baseName());
+//        idxs->push_back(info.baseName().toInt());
     }
+//    this->progressScene->setUpIndexes(idxs);
+//    this->setAverageChart();
 
     /*==========BlueTooth==========*/
     QBluetoothDeviceDiscoveryAgent *discoveryAgent = new QBluetoothDeviceDiscoveryAgent(this);
@@ -105,6 +110,7 @@ MainWindow::MainWindow(QWidget *parent)
             this, SLOT(discoverBlueTooth(QBluetoothDeviceInfo)));
     connect(discoveryAgent, SIGNAL(finished()), this, SLOT(scanFinished()));
     discoveryAgent->start();
+    this->menuScene->BTSearching();
 
 }
 
@@ -125,6 +131,28 @@ void MainWindow::toBuildScene(int lvl)
     this->buildScene->setLevel(lvl);
 }
 
+//void MainWindow::passLevelData(int lvl)
+//{
+//    QVector<int> *pts = new QVector<int>;
+//    for (int i = 0; i < records->value(lvl)->length(); i++) {
+//        pts->append(this->records->value(lvl)->at(i).timeUsed);
+//    }
+//    this->progressScene->setSeries(pts);
+//}
+
+//void MainWindow::setAverageChart()
+//{
+//    QVector<double> *Averages = new QVector<double>;
+//    for (QMap<int, QVector<Record> *>::iterator it = this->records->begin(); it != this->records->end(); it++) {
+//        int sum = 0;
+//        for (int i = 0; i < it.value()->length(); i++) {
+//            sum += it.value()->at(i).timeUsed;
+//        }
+//        Averages->push_back((double)(sum/it.value()->length()));
+//    }
+//    this->progressScene->setAverage(Averages);
+//}
+
 // tell every scene that the window size is changed
 // hence to rearrange widgets on them
 void MainWindow::resizeEvent(QResizeEvent *)
@@ -136,6 +164,7 @@ void MainWindow::resizeEvent(QResizeEvent *)
 void MainWindow::readRecordFile(QString fileDir, QString level)
 {
     int minTime = INT_MAX;
+    QVector<int> pts;
 
     QFile file(fileDir);
     file.open(QIODevice::ReadOnly);
@@ -159,10 +188,12 @@ void MainWindow::readRecordFile(QString fileDir, QString level)
             singleLevelRecord->push_back(record);
 
             minTime = minTime < record.timeUsed ? minTime : record.timeUsed;
+            pts.push_back(record.timeUsed);
         }
         this->records->insert(level.toInt(), singleLevelRecord);
 
         this->levelSelectScene->setStarRecords(level.toInt(), minTime);
+        this->progressScene->addChart(level.toInt(), pts);
     }
 }
 
@@ -259,8 +290,8 @@ void MainWindow::readBluetoothData()
     qint64 len = socket->read((char *)data, 100);
 
     QByteArray qa2((char*)data ,len);
-    QString qstr(qa2.toHex());
-    qDebug()<<"----" << qstr;
+//    QString qstr(qa2.toHex());
+    qDebug()<<"----" << qa2;
 }
 
 void MainWindow::sendBluetoothData(Package package)
@@ -280,6 +311,7 @@ void MainWindow::sendBluetoothData(Package package)
 
 void MainWindow::bluetoothConnected()
 {
+    this->menuScene->BTConnected();
     qDebug() << "Bluetooth Connected.";
 }
 

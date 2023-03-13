@@ -3,6 +3,7 @@
 
 #include <QWidget>
 #include <QToolButton>
+#include <QLabel>
 
 class Menu : public QWidget
 {
@@ -15,6 +16,8 @@ public:
 public slots:
     void shiftLeft();
     void shiftRight();
+    void BTSearching();
+    void BTConnected();
 
 signals:
     void centralBtnClicked();
@@ -28,6 +31,8 @@ private:
     QToolButton *CentralBtn = nullptr;
     QToolButton *leftBtn = nullptr;
     QToolButton *rightBtn = nullptr;
+    QWidget *BTInfo = nullptr;
+    QLabel *BTLabel = nullptr;
 
 };
 
