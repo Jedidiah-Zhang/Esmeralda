@@ -17,7 +17,11 @@ public slots:
     void shiftLeft();
     void shiftRight();
     void BTSearching();
+    void BTSearchFailed();
+    void BTConnecting();
+    void BTConeectionFailed();
     void BTConnected();
+    void BTConnectionLost();
 
 signals:
     void centralBtnClicked();

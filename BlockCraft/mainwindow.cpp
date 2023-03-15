@@ -57,6 +57,7 @@ MainWindow::MainWindow(QWidget *parent)
         this->menuList->setCurrentIndex(LEVELSELECT);
     });
     connect(this->buildScene, &Build::updateRecordFilesReady, this, &MainWindow::updateRecordFiles);
+    connect(this->buildScene, &Build::updateRecordFilesReady, this, &MainWindow::sendAudioSucess);
 
     // design scene
     connect(this->designScene, &Design::backButtonClicked, this, [=](){
@@ -104,12 +105,13 @@ MainWindow::MainWindow(QWidget *parent)
 //    this->setAverageChart();
 
     /*==========BlueTooth==========*/
-    QBluetoothDeviceDiscoveryAgent *discoveryAgent = new QBluetoothDeviceDiscoveryAgent(this);
-    discoveryAgent->setLowEnergyDiscoveryTimeout(15000);
+    this->discoveryAgent = new QBluetoothDeviceDiscoveryAgent(this);
+    this->discoveryAgent->setLowEnergyDiscoveryTimeout(5000);
     connect(discoveryAgent, SIGNAL(deviceDiscovered(QBluetoothDeviceInfo)),
-            this, SLOT(discoverBlueTooth(QBluetoothDeviceInfo)));
-    connect(discoveryAgent, SIGNAL(finished()), this, SLOT(scanFinished()));
-    discoveryAgent->start();
+            this, SLOT(BTDiscover(QBluetoothDeviceInfo)));
+    connect(this, &MainWindow::deviceFound, this, &MainWindow::BTConnect);
+    connect(discoveryAgent, &QBluetoothDeviceDiscoveryAgent::finished, menuScene, &Menu::BTSearchFailed);
+    this->discoveryAgent->start();
     this->menuScene->BTSearching();
 
 }
@@ -130,28 +132,6 @@ void MainWindow::toBuildScene(int lvl)
     this->menuList->setCurrentIndex(BUILD);
     this->buildScene->setLevel(lvl);
 }
-
-//void MainWindow::passLevelData(int lvl)
-//{
-//    QVector<int> *pts = new QVector<int>;
-//    for (int i = 0; i < records->value(lvl)->length(); i++) {
-//        pts->append(this->records->value(lvl)->at(i).timeUsed);
-//    }
-//    this->progressScene->setSeries(pts);
-//}
-
-//void MainWindow::setAverageChart()
-//{
-//    QVector<double> *Averages = new QVector<double>;
-//    for (QMap<int, QVector<Record> *>::iterator it = this->records->begin(); it != this->records->end(); it++) {
-//        int sum = 0;
-//        for (int i = 0; i < it.value()->length(); i++) {
-//            sum += it.value()->at(i).timeUsed;
-//        }
-//        Averages->push_back((double)(sum/it.value()->length()));
-//    }
-//    this->progressScene->setAverage(Averages);
-//}
 
 // tell every scene that the window size is changed
 // hence to rearrange widgets on them
@@ -265,54 +245,96 @@ void MainWindow::updateRecordFiles(int idx, int curT, int useT, int Att)
         minTime = minTime < time ? minTime : time;
     }
     this->levelSelectScene->setStarRecords(idx, minTime);
+    this->progressScene->addPoint(idx, useT);
 }
 
-void MainWindow::discoverBlueTooth(QBluetoothDeviceInfo info)
+void MainWindow::BTDiscover(QBluetoothDeviceInfo info)
 {
     QString label = QString("%1 %2").arg(info.address().toString(), info.name());
-    if (info.name() == "HC-05") this->BTaddress = info.address().toString();
+    if (info.name() == "HC-05") {
+        this->BTaddress = info.address().toString();
+        emit deviceFound();
+        this->discoveryAgent->stop();
+    }
     qDebug() << label;
 }
 
-void MainWindow::scanFinished()
+void MainWindow::BTConnect()
 {
-    qDebug() << "Scan Finished";
+//    qDebug() << "Scan Finished";
+    this->menuScene->BTConnecting();
     static QString serviceUuid("00001101-0000-1000-8000-00805F9B34FB");
     this->socket = new QBluetoothSocket(QBluetoothServiceInfo::RfcommProtocol);
     this->socket->connectToService(QBluetoothAddress(this->BTaddress), QBluetoothUuid(serviceUuid),QIODevice::ReadWrite);
-    connect(this->socket, SIGNAL(readyRead()), this, SLOT(readBluetoothData()));
-    connect(this->socket, SIGNAL(connected()), this, SLOT(bluetoothConnected()));
+    connect(this->socket, &QBluetoothSocket::readyRead, this, &MainWindow::BTReadData);
+    connect(this->socket, &QBluetoothSocket::connected, this, &MainWindow::BTConnected);
+    connect(this->socket, &QBluetoothSocket::disconnected, this, &MainWindow::BTReSearching);
+    connect(this->socket, SIGNAL(errorOccurred(QBluetoothSocket::SocketError)),
+            this, SLOT(BTUnableConnect(QBluetoothSocket::SocketError)));
 }
 
-void MainWindow::readBluetoothData()
+void MainWindow::BTReSearching()
 {
-    char data[100];
-    qint64 len = socket->read((char *)data, 100);
+    this->menuScene->BTConnectionLost();
+
+    QTimer::singleShot(3000, this, [=](){
+        this->menuScene->BTSearching();
+        this->discoveryAgent->start();
+    });
+}
+
+void MainWindow::BTReadData()
+{
+    char data[1000];
+    qint64 len = socket->read((char *)data, 1000);
 
     QByteArray qa2((char*)data ,len);
 //    QString qstr(qa2.toHex());
-    qDebug()<<"----" << qa2;
+    qDebug()<<"----" << qa2 << len;
 }
 
-void MainWindow::sendBluetoothData(Package package)
+void MainWindow::BTSendData(Package package)
 {
     switch (package.cmd) {
     case AUDIO:
+        socket->write("0010");
+        socket->write(package.data);
         break;
     case LED:
+        socket->write("0011");
+        socket->write(package.data);
         break;
     default:
         break;
     }
 
     qDebug() << "Send Data";
-    // socket->write(data);
 }
 
-void MainWindow::bluetoothConnected()
+void MainWindow::BTConnected()
 {
     this->menuScene->BTConnected();
     qDebug() << "Bluetooth Connected.";
+}
+
+void MainWindow::BTUnableConnect(QBluetoothSocket::SocketError err)
+{
+    if (err == QBluetoothSocket::SocketError::ServiceNotFoundError) {
+        this->menuScene->BTConeectionFailed();
+
+        QTimer::singleShot(3000, this, [=](){
+            this->menuScene->BTSearching();
+            this->discoveryAgent->start();
+        });
+    }
+}
+
+void MainWindow::sendAudioSucess()
+{
+    Package pkg;
+    pkg.cmd = AUDIO;
+    pkg.data = QByteArray("00000000000000000000001");
+    BTSendData(pkg);
 }
 
 MainWindow::~MainWindow()

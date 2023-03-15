@@ -90,6 +90,11 @@ void Build::setLevel(int lvl)
 
 void Build::success()
 {
+    QMessageBox msg;
+    msg.setText("Success! ");
+    msg.setStandardButtons(QMessageBox::Ok);
+    msg.setDefaultButton(QMessageBox::Ok);
+
     QDateTime curDateTime = QDateTime::currentDateTime();
     int time = curDateTime.toSecsSinceEpoch();
     emit updateRecordFilesReady(this->levelIdx, time, this->timeTaken, this->attempts);

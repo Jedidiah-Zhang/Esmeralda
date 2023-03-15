@@ -55,7 +55,7 @@ enum COMMANDS {
 
 typedef struct Package {
     int cmd;
-    QByteArray *data;
+    QByteArray data;
 } Package;
 
 class MainWindow : public QMainWindow
@@ -77,13 +77,17 @@ public slots:
     void updateRecordFiles(int idx, int curT, int useT, int Att);
 
 private slots:
-    void discoverBlueTooth(QBluetoothDeviceInfo info);
-    void scanFinished();
-    void readBluetoothData();
-    void sendBluetoothData(Package package);
-    void bluetoothConnected();
+    void BTDiscover(QBluetoothDeviceInfo info);
+    void BTConnect();
+    void BTReSearching();
+    void BTReadData();
+    void BTSendData(Package package);
+    void BTConnected();
+    void BTUnableConnect(QBluetoothSocket::SocketError err);
+    void sendAudioSucess();
 
 signals:
+    void deviceFound();
 
 private:
 //    void setAverageChart();
@@ -100,11 +104,12 @@ private:
     Progress *progressScene = nullptr;
     Build *buildScene = nullptr;
 
-    QMap<int, QVector<Record> *> *records;
-    QMap<int, QVector<Block> *> *levels;
+    QMap<int, QVector<Record> *> *records = nullptr;
+    QMap<int, QVector<Block> *> *levels = nullptr;
 
-    QBluetoothLocalDevice *localDevice;
+    QBluetoothDeviceDiscoveryAgent *discoveryAgent = nullptr;
+    QBluetoothLocalDevice *localDevice = nullptr;
     QString BTaddress;
-    QBluetoothSocket *socket;
+    QBluetoothSocket *socket = nullptr;
 };
 #endif // MAINWINDOW_H

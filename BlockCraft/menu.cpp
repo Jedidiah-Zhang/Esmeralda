@@ -32,7 +32,7 @@ Menu::Menu(QWidget *parent)
     layout->addWidget(BTLabel);
     layout->setAlignment(Qt::AlignLeft);
     BTInfo->setLayout(layout);
-    BTInfo->setFixedSize(200, 50);
+    BTInfo->setFixedSize(250, 50);
 
     this->CentralBtn = new QToolButton(this);
     this->CentralBtn->setStyleSheet("QToolButton{"
@@ -123,6 +123,24 @@ void Menu::shiftRight()
 void Menu::BTSearching()
 {
     this->BTLabel->setText("Searching...");
+    this->BTLabel->setStyleSheet("color: brown");
+}
+
+void Menu::BTSearchFailed()
+{
+    this->BTLabel->setText("Device Not Found");
+    this->BTLabel->setStyleSheet("color: red");
+}
+
+void Menu::BTConnecting()
+{
+    this->BTLabel->setText("Connecting...");
+    this->BTLabel->setStyleSheet("color: brown");
+}
+
+void Menu::BTConeectionFailed()
+{
+    this->BTLabel->setText("Connection Failed");
     this->BTLabel->setStyleSheet("color: red");
 }
 
@@ -135,4 +153,10 @@ void Menu::BTConnected()
     QTimer::singleShot(3000, this, [=](){
         this->BTInfo->setVisible(false);
     });
+}
+
+void Menu::BTConnectionLost() {
+    this->BTLabel->setText("Connection Lost");
+    this->BTLabel->setStyleSheet("color: red");
+    this->BTInfo->setVisible(true);
 }

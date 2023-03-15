@@ -84,22 +84,23 @@ void Progress::addChart(int idx, QVector<int> pts)
     chart->setBackgroundRoundness(30);
     chart->legend()->hide();
 
-    chart->addSeries(this->lineSeries.value(idx));
-    chart->addAxis(AxXs.value(idx), Qt::AlignBottom);
-    chart->addAxis(AxYs.value(idx), Qt::AlignLeft);
-    this->lineSeries.value(idx)->attachAxis(AxXs.value(idx));
-    this->lineSeries.value(idx)->attachAxis(AxYs.value(idx));
-    this->lineSeries.value(idx)->setPointsVisible(true);
-    AxXs.value(idx)->setTitleText("Records");
-    AxYs.value(idx)->setTitleText("Time Used (Minutes)");
+    chart->addSeries(this->lineSeries[idx]);
+    chart->addAxis(AxXs[idx], Qt::AlignBottom);
+    chart->addAxis(AxYs[idx], Qt::AlignLeft);
+    this->lineSeries[idx]->attachAxis(AxXs[idx]);
+    this->lineSeries[idx]->attachAxis(AxYs[idx]);
+    this->lineSeries[idx]->setPointsVisible(true);
+    AxXs[idx]->setTitleText("Records");
+    AxYs[idx]->setTitleText("Time Used (Minutes)");
 
     int max = 0;
     for (int i = 0; i < pts.length(); i++) {
-        max = pts.at(i) > max ? pts.at(i) : max;
-        this->lineSeries.value(idx)->append(i, (double)pts.at(i)/6000);
+        max = pts[i] > max ? pts[i] : max;
+        this->lineSeries[idx]->append(i, (double)pts[i]/6000);
     }
     maxTimes.insert(idx, max);
     averages.insert(idx, (double)max/pts.length());
+    dataLength.insert(idx, pts.length());
     double maxMin = (double) max / 6000;
     AxXs.value(idx)->setRange(0, pts.length());
     AxXs.value(idx)->setTickCount(pts.length()+1);
@@ -119,9 +120,9 @@ void Progress::updateAverage()
     this->BarAxX->clear();
     for (int i = 0; i < this->levelIndexes.length(); i++)
     {
-        max = averages.value(levelIndexes.at(i)) > max ? averages.value(levelIndexes.at(i)) : max;
-        *timeBar << this->averages.value(levelIndexes.at(i))/6000;
-        this->BarAxX->append(QString("Level %1").arg(this->levelIndexes.at(i)+1));
+        max = averages[levelIndexes[i]] > max ? averages[levelIndexes[i]] : max;
+        *timeBar << this->averages[levelIndexes[i]]/6000;
+        this->BarAxX->append(QString("Level %1").arg(this->levelIndexes[i]+1));
     }
     double maxMin = (double) max / 6000;
     this->BarAxY->setRange(0, maxMin+1);
@@ -130,83 +131,18 @@ void Progress::updateAverage()
     this->aveSeries->append(timeBar);
 }
 
-//void Progress::setUpIndexes(QVector<int> *idxs)
-//{
-//    this->levelIndexes = idxs;
-//    for (int i = 0; i < idxs->length(); i++) {
-//        this->selectBox->addItem(QString("LEVEL %1").arg(idxs->at(i)+1));
-//        QLineSeries *lSeries = new QLineSeries();
-//        QValueAxis *AxX = new QValueAxis();
-//        QValueAxis *AxY = new QValueAxis();
-//        AxX->setTitleText("Records");
-//        AxY->setTitleText("Time Used (Minutes)");
-//        this->AxXs.push_back(AxX);
-//        this->AxYs.push_back(AxY);
-//        this->lineSeries.push_back(lSeries);
-//        this->chart->addSeries(lSeries);
-//        this->chart->addAxis(AxX, Qt::AlignBottom);
-//        this->chart->addAxis(AxY, Qt::AlignLeft);
-//        lSeries->setVisible(false);
-//        emit requestLevelData(this->levelIndexes->at(i));
-//    }
-//}
-
-//void Progress::setSeries(QVector<int> *pts)
-//{
-//    this->maxTimes.append(0);
-//    for (int i = 0; i < pts->length(); i++) {
-//        maxTimes.back() = pts->at(i) > maxTimes.back() ? pts->at(i) : maxTimes.back();
-//        this->lineSeries.back()->append(i, (double)pts->at(i)/6000);
-
-//    }
-//    double maxMin = (double) maxTimes.back() / 6000;
-//    this->AxYs.back()->setRange(0, maxMin+1);
-//    this->AxYs.back()->setTickCount(11);
-//    this->AxXs.back()->setRange(1, this->lineSeries.back()->count());
-//    this->AxXs.back()->setTickCount(this->lineSeries.back()->count());
-//}
-
-//void Progress::setAverage(QVector<double> *pts)
-//{
-//    if (this->barSeries == nullptr || pts != nullptr) {
-//        QBarSet *timeBar = new QBarSet("Time Used");
-////    QBarSet *attBar = new QBarSet("Attempts");
-//        for (int i = 0; i < pts->length(); i++) {
-//            *timeBar << pts->at(i)/6000;
-//        }
-//        this->barSeries->append(timeBar);
-
-//        int maxTime = 0;
-//        for (int i = 0; i < this->levelIndexes->length(); i++) {
-//            maxTime = pts->at(i) > maxTime ? pts->at(i) : maxTime;
-//            BarAxX->append(QString("Level %1").arg(this->levelIndexes->at(i)+1));
-//        }
-//        double maxMin = (double) maxTime / 6000;
-//        this->BarAxY->setRange(0, maxMin+1);
-//        this->BarAxY->setTickCount(11);
-//        this->chart->addSeries(this->barSeries);
-//        this->barSeries->attachAxis(BarAxX);
-//        this->barSeries->attachAxis(BarAxY);
-//    }
-
-////    this->chart->removeAllSeries();
-//    foreach (QAbstractSeries *series, chart->series()) {
-//        if (dynamic_cast<QLineSeries*>(series)) {
-//            QLineSeries *lineSer = dynamic_cast<QLineSeries*>(series);
-//            lineSer->setVisible(false);
-//        }
-//        else if (dynamic_cast<QBarSeries*>(series)) {
-//            QBarSeries *barSer = dynamic_cast<QBarSeries*>(series);
-//            barSer->setVisible(true);
-//        }
-//    }
-//    for (int i = 0; i < this->AxXs.length(); i++) {
-//        this->chart->removeAxis(AxXs.at(i));
-//        this->chart->removeAxis(AxYs.at(i));
-//    }
-//    this->chart->addAxis(this->BarAxX, Qt::AlignBottom);
-//    this->chart->addAxis(this->BarAxY, Qt::AlignLeft);
-//}
+void Progress::addPoint(int idx, int pt)
+{
+    this->lineSeries.value(idx)->append(dataLength[idx], pt);
+    if (pt > this->maxTimes[idx]) {
+        this->maxTimes[idx] =  pt;
+        double maxMin = (double) pt / 6000;
+        AxYs.value(idx)->setRange(0, maxMin+1);
+    }
+    dataLength[idx]++;
+    AxXs.value(idx)->setRange(0, dataLength[idx]);
+    AxXs.value(idx)->setTickCount(dataLength[idx]+1);
+}
 
 void Progress::changeLevel()
 {
