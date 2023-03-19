@@ -3,47 +3,52 @@
         {
             "attempts": 1,
             "startTime": 1678549647,
-            "timeUsed": 608
+            "timeUsed": 28234
         },
         {
             "attempts": 1,
             "startTime": 1678549810,
-            "timeUsed": 380
+            "timeUsed": 27034
         },
         {
             "attempts": 1,
             "startTime": 1678549820,
-            "timeUsed": 242
+            "timeUsed": 26234
         },
         {
             "attempts": 1,
             "startTime": 1678622464,
-            "timeUsed": 500
+            "timeUsed": 25534
         },
         {
             "attempts": 1,
             "startTime": 1678659276,
-            "timeUsed": 15264
+            "timeUsed": 25564
         },
         {
             "attempts": 1,
             "startTime": 1678659334,
-            "timeUsed": 162
+            "timeUsed": 25000
         },
         {
             "attempts": 1,
             "startTime": 1678722629,
-            "timeUsed": 162
+            "timeUsed": 23562
         },
         {
             "attempts": 1,
             "startTime": 1678723444,
-            "timeUsed": 207
+            "timeUsed": 22007
         },
         {
             "attempts": 1,
             "startTime": 1678725368,
-            "timeUsed": 203
+            "timeUsed": 22203
+        },
+        {
+            "attempts": 1,
+            "startTime": 1678888687,
+            "timeUsed": 21272
         }
     ]
 }

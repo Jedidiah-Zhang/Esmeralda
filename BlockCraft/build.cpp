@@ -32,11 +32,12 @@ Build::Build(QWidget *parent)
     startBtn->setParent(this);
     layout->addWidget(startBtn, 0, Qt::AlignHCenter);
 
+    this->finishBtn = new PushButton(QSize(220, 80), "://resources/images/finishButton.png");
+    finishBtn->setParent(this);
+    layout->addWidget(finishBtn, 0, Qt::AlignHCenter);
+    finishBtn->hide();
+
     layout->setAlignment(Qt::AlignCenter);
-
-    // link to 3D
-
-
 
     connect(backBtn, &PushButton::clicked, this, [=](){
         backBtn->bounce(true);
@@ -75,7 +76,19 @@ Build::Build(QWidget *parent)
         QTimer::singleShot(100, this, [=](){
             // hides the start button after clicking
             startBtn->hide();
+            finishBtn->show();
             this->startTiming();
+        });
+    });
+
+    connect(finishBtn, &PushButton::clicked, this, [=](){
+        pauseTiming();
+        finishBtn->bounce(true);
+        finishBtn->bounce(false);
+
+        QTimer::singleShot(100, this, [=](){
+            finishBtn->hide();
+            emit finishButtonClicked();
         });
     });
 
@@ -94,6 +107,7 @@ void Build::success()
     msg.setText("Success! ");
     msg.setStandardButtons(QMessageBox::Ok);
     msg.setDefaultButton(QMessageBox::Ok);
+    msg.exec();
 
     QDateTime curDateTime = QDateTime::currentDateTime();
     int time = curDateTime.toSecsSinceEpoch();
@@ -101,6 +115,19 @@ void Build::success()
 
     emit this->backButtonClicked();
     resetTiming();
+    startBtn->show();
+}
+
+void Build::failed()
+{
+    QMessageBox msg;
+    msg.setText("There are still blocks not in the correct position.");
+    msg.setStandardButtons(QMessageBox::Retry);
+    msg.setDefaultButton(QMessageBox::Retry);
+    msg.exec();
+
+    this->attempts += 1;
+    finishBtn->show();
 }
 
 void Build::startTiming()
@@ -148,6 +175,7 @@ void Build::updateTime()
 void Build::keyPressEvent(QKeyEvent *event)
 {
     if (event->key() == Qt::Key_V) {
+        qDebug() << "Receive: 0x";
         success();
     }
 }

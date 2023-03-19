@@ -38,6 +38,44 @@ MainWindow::MainWindow(QWidget *parent)
     this->menuList->setCurrentIndex(MENU);
     setCentralWidget(this->menuList);
 
+    /*==========FileReading==========*/
+    // load levels
+    this->levels = new QMap<int, QVector<Block> *>;
+    QDir dirLevel("../BlockCraft/levels/");
+    dirLevel.setFilter(QDir::Files | QDir::NoSymLinks);
+    QFileInfoList lvlList = dirLevel.entryInfoList();
+    for (int i = 0; i < lvlList.count(); i++) {
+        QFileInfo info = lvlList.at(i);
+        QFile file(info.absoluteFilePath());
+        readLevelFile(info.absoluteFilePath(), info.baseName());
+    }
+    this->levelSelectScene->setLevels(this->levels->count());
+
+    // load records
+    this->records = new QMap<int, QVector<Record> *>;
+    QDir dirRecord("../BlockCraft/records/");
+    dirRecord.setFilter(QDir::Files | QDir::NoSymLinks);
+    QFileInfoList rcdList = dirRecord.entryInfoList();
+    // go through every file
+    for(int i = 0; i < rcdList.count(); i++) {
+        QFileInfo info = rcdList.at(i);
+        QFile file(info.absoluteFilePath());
+        readRecordFile(info.absoluteFilePath(), info.baseName());
+    }
+
+    /*==========BlueTooth==========*/
+    this->blueTooth = new BlueTooth(this);
+    connect(blueTooth, &BlueTooth::EndSearch, menuScene, &Menu::BTSearchFailed);
+    connect(blueTooth, &BlueTooth::Searching, menuScene, &Menu::BTSearching);
+    connect(blueTooth, &BlueTooth::Connecting, menuScene, &Menu::BTConnecting);
+    connect(blueTooth, &BlueTooth::Connected, menuScene, &Menu::BTConnected);
+    connect(blueTooth, &BlueTooth::ConncetFaild, menuScene, &Menu::BTConeectionFailed);
+    connect(blueTooth, &BlueTooth::ConncetLost, menuScene, &Menu::BTConnectionLost);
+    connect(blueTooth, &BlueTooth::ComfirmTrue, buildScene, &Build::success);
+    connect(blueTooth, &BlueTooth::ComfirmFalse, buildScene, &Build::failed);
+
+    this->blueTooth->startSearch();
+
     /*==========Connections==========*/
     // menu scene
     connect(this->menuScene, SIGNAL(leftBtnClicked(int)), this, SLOT(changeScene(int)));
@@ -56,8 +94,9 @@ MainWindow::MainWindow(QWidget *parent)
     connect(this->buildScene, &Build::backButtonClicked, this, [=](){
         this->menuList->setCurrentIndex(LEVELSELECT);
     });
+    connect(this->buildScene, &Build::finishButtonClicked, blueTooth, &BlueTooth::sendCompletion);
     connect(this->buildScene, &Build::updateRecordFilesReady, this, &MainWindow::updateRecordFiles);
-    connect(this->buildScene, &Build::updateRecordFilesReady, this, &MainWindow::sendAudioSucess);
+    connect(this->buildScene, &Build::updateRecordFilesReady, blueTooth, &BlueTooth::sendAudioSucess);
 
     // design scene
     connect(this->designScene, &Design::backButtonClicked, this, [=](){
@@ -73,47 +112,6 @@ MainWindow::MainWindow(QWidget *parent)
     connect(this->progressScene, &Progress::backButtonClicked, this, [=](){
         this->menuList->setCurrentIndex(MENU);
     });
-//    connect(this->progressScene, SIGNAL(requestLevelData(int)), this, SLOT(passLevelData(int)));
-
-    /*==========FileReading==========*/
-    // load levels
-    this->levels = new QMap<int, QVector<Block> *>;
-    QDir dirLevel("../BlockCraft/levels/");
-    dirLevel.setFilter(QDir::Files | QDir::NoSymLinks);
-    QFileInfoList lvlList = dirLevel.entryInfoList();
-    for (int i = 0; i < lvlList.count(); i++) {
-        QFileInfo info = lvlList.at(i);
-        QFile file(info.absoluteFilePath());
-        readLevelFile(info.absoluteFilePath(), info.baseName());
-    }
-    this->levelSelectScene->setLevels(this->levels->count());
-
-    // load records
-    this->records = new QMap<int, QVector<Record> *>;
-//    QVector<int> *idxs = new QVector<int>;
-    QDir dirRecord("../BlockCraft/records/");
-    dirRecord.setFilter(QDir::Files | QDir::NoSymLinks);
-    QFileInfoList rcdList = dirRecord.entryInfoList();
-    // go through every file
-    for(int i = 0; i < rcdList.count(); i++) {
-        QFileInfo info = rcdList.at(i);
-        QFile file(info.absoluteFilePath());
-        readRecordFile(info.absoluteFilePath(), info.baseName());
-//        idxs->push_back(info.baseName().toInt());
-    }
-//    this->progressScene->setUpIndexes(idxs);
-//    this->setAverageChart();
-
-    /*==========BlueTooth==========*/
-    this->discoveryAgent = new QBluetoothDeviceDiscoveryAgent(this);
-    this->discoveryAgent->setLowEnergyDiscoveryTimeout(5000);
-    connect(discoveryAgent, SIGNAL(deviceDiscovered(QBluetoothDeviceInfo)),
-            this, SLOT(BTDiscover(QBluetoothDeviceInfo)));
-    connect(this, &MainWindow::deviceFound, this, &MainWindow::BTConnect);
-    connect(discoveryAgent, &QBluetoothDeviceDiscoveryAgent::finished, menuScene, &Menu::BTSearchFailed);
-    this->discoveryAgent->start();
-    this->menuScene->BTSearching();
-
 }
 
 // switch the function of the central button
@@ -129,8 +127,10 @@ void MainWindow::changeScene(int idx)
 // switch to build scene, with specified level
 void MainWindow::toBuildScene(int lvl)
 {
-    this->menuList->setCurrentIndex(BUILD);
     this->buildScene->setLevel(lvl);
+    this->menuList->setCurrentIndex(BUILD);
+
+    this->blueTooth->sendStructure(this->levels->value(lvl));
 }
 
 // tell every scene that the window size is changed
@@ -195,10 +195,9 @@ void MainWindow::readLevelFile(QString fileDir, QString level)
         for (int j = 0; j < array.count(); j++) {
             QJsonObject blockObj = array.at(j).toObject();
             Block block;
+            block.tile = blockObj.value("tile").toInt();
+            block.height = blockObj.value("height").toInt();
             block.ID = blockObj.value("ID").toInt();
-            block.x = blockObj.value("x").toInt();
-            block.z = blockObj.value("z").toInt();
-            block.y = blockObj.value("y").toInt();
             block.rot = blockObj.value("rot").toInt();
             blocks->push_back(block);
         }
@@ -246,95 +245,6 @@ void MainWindow::updateRecordFiles(int idx, int curT, int useT, int Att)
     }
     this->levelSelectScene->setStarRecords(idx, minTime);
     this->progressScene->addPoint(idx, useT);
-}
-
-void MainWindow::BTDiscover(QBluetoothDeviceInfo info)
-{
-    QString label = QString("%1 %2").arg(info.address().toString(), info.name());
-    if (info.name() == "HC-05") {
-        this->BTaddress = info.address().toString();
-        emit deviceFound();
-        this->discoveryAgent->stop();
-    }
-    qDebug() << label;
-}
-
-void MainWindow::BTConnect()
-{
-//    qDebug() << "Scan Finished";
-    this->menuScene->BTConnecting();
-    static QString serviceUuid("00001101-0000-1000-8000-00805F9B34FB");
-    this->socket = new QBluetoothSocket(QBluetoothServiceInfo::RfcommProtocol);
-    this->socket->connectToService(QBluetoothAddress(this->BTaddress), QBluetoothUuid(serviceUuid),QIODevice::ReadWrite);
-    connect(this->socket, &QBluetoothSocket::readyRead, this, &MainWindow::BTReadData);
-    connect(this->socket, &QBluetoothSocket::connected, this, &MainWindow::BTConnected);
-    connect(this->socket, &QBluetoothSocket::disconnected, this, &MainWindow::BTReSearching);
-    connect(this->socket, SIGNAL(errorOccurred(QBluetoothSocket::SocketError)),
-            this, SLOT(BTUnableConnect(QBluetoothSocket::SocketError)));
-}
-
-void MainWindow::BTReSearching()
-{
-    this->menuScene->BTConnectionLost();
-
-    QTimer::singleShot(3000, this, [=](){
-        this->menuScene->BTSearching();
-        this->discoveryAgent->start();
-    });
-}
-
-void MainWindow::BTReadData()
-{
-    char data[1000];
-    qint64 len = socket->read((char *)data, 1000);
-
-    QByteArray qa2((char*)data ,len);
-//    QString qstr(qa2.toHex());
-    qDebug()<<"----" << qa2 << len;
-}
-
-void MainWindow::BTSendData(Package package)
-{
-    switch (package.cmd) {
-    case AUDIO:
-        socket->write("0010");
-        socket->write(package.data);
-        break;
-    case LED:
-        socket->write("0011");
-        socket->write(package.data);
-        break;
-    default:
-        break;
-    }
-
-    qDebug() << "Send Data";
-}
-
-void MainWindow::BTConnected()
-{
-    this->menuScene->BTConnected();
-    qDebug() << "Bluetooth Connected.";
-}
-
-void MainWindow::BTUnableConnect(QBluetoothSocket::SocketError err)
-{
-    if (err == QBluetoothSocket::SocketError::ServiceNotFoundError) {
-        this->menuScene->BTConeectionFailed();
-
-        QTimer::singleShot(3000, this, [=](){
-            this->menuScene->BTSearching();
-            this->discoveryAgent->start();
-        });
-    }
-}
-
-void MainWindow::sendAudioSucess()
-{
-    Package pkg;
-    pkg.cmd = AUDIO;
-    pkg.data = QByteArray("00000000000000000000001");
-    BTSendData(pkg);
 }
 
 MainWindow::~MainWindow()

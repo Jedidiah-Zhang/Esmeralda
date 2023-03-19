@@ -3,12 +3,7 @@
         {
             "attempts": 1,
             "startTime": 1678553211,
-            "timeUsed": 16389
-        },
-        {
-            "attempts": 1,
-            "startTime": 1678617417,
-            "timeUsed": 239
+            "timeUsed": 116389
         }
     ]
 }

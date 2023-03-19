@@ -100,6 +100,7 @@ void levelSelect::setLevels(int levelCount)
 
             QTimer::singleShot(100, this, [=](){
                 emit this->levelSelected(i);
+
             });
         });
     }

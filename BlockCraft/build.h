@@ -19,13 +19,17 @@ public:
     void pauseTiming();
     void resetTiming();
 
+public slots:
+    void success();
+    void failed();
+
+private slots:
+    void timeInc();
+
 signals:
     void backButtonClicked();
     void updateRecordFilesReady(int idx, int curT, int useT, int Att);
-
-public slots:
-    void timeInc();
-    void success();
+    void finishButtonClicked();
 
 private:
     void updateTime();
@@ -38,6 +42,7 @@ private:
     QLabel *tmLbl = nullptr;
     QTimer *timer = nullptr;
     PushButton *startBtn = nullptr;
+    PushButton *finishBtn = nullptr;
 };
 
 #endif // BUILD_H

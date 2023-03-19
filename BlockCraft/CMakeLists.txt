@@ -30,6 +30,9 @@ set(PROJECT_SOURCES
     games.cpp
     progress.h
     progress.cpp
+    bluetooth.h
+    bluetooth.cpp
+    structs.h
     mainwindow.ui
     res.qrc
 )

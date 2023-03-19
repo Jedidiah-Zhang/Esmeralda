@@ -93,23 +93,23 @@ void Progress::addChart(int idx, QVector<int> pts)
     AxXs[idx]->setTitleText("Records");
     AxYs[idx]->setTitleText("Time Used (Minutes)");
 
-    int max = 0;
+    int max = 0, sum = 0;
     for (int i = 0; i < pts.length(); i++) {
         max = pts[i] > max ? pts[i] : max;
+        sum += pts[i];
         this->lineSeries[idx]->append(i, (double)pts[i]/6000);
     }
     maxTimes.insert(idx, max);
-    averages.insert(idx, (double)max/pts.length());
+    averages.insert(idx, (double)sum/pts.length());
     dataLength.insert(idx, pts.length());
     double maxMin = (double) max / 6000;
-    AxXs.value(idx)->setRange(0, pts.length());
-    AxXs.value(idx)->setTickCount(pts.length()+1);
-    AxYs.value(idx)->setRange(0, maxMin+1);
-    AxYs.value(idx)->setTickCount(11);
+    AxXs[idx]->setRange(0, pts.length());
+    AxXs[idx]->setTickCount(pts.length()+1);
+    AxYs[idx]->setRange(0, maxMin+1);
+    AxYs[idx]->setTickCount(11);
 
     chartView->setChart(chart);
     this->charts->addWidget(chartView);
-
     updateAverage();
 }
 
@@ -121,7 +121,7 @@ void Progress::updateAverage()
     for (int i = 0; i < this->levelIndexes.length(); i++)
     {
         max = averages[levelIndexes[i]] > max ? averages[levelIndexes[i]] : max;
-        *timeBar << this->averages[levelIndexes[i]]/6000;
+        *timeBar << this->averages[levelIndexes[i]] / 6000;
         this->BarAxX->append(QString("Level %1").arg(this->levelIndexes[i]+1));
     }
     double maxMin = (double) max / 6000;
@@ -133,6 +133,7 @@ void Progress::updateAverage()
 
 void Progress::addPoint(int idx, int pt)
 {
+    qDebug() << idx << pt;
     this->lineSeries.value(idx)->append(dataLength[idx], pt);
     if (pt > this->maxTimes[idx]) {
         this->maxTimes[idx] =  pt;
@@ -140,8 +141,11 @@ void Progress::addPoint(int idx, int pt)
         AxYs.value(idx)->setRange(0, maxMin+1);
     }
     dataLength[idx]++;
-    AxXs.value(idx)->setRange(0, dataLength[idx]);
-    AxXs.value(idx)->setTickCount(dataLength[idx]+1);
+    averages[idx] = (double) maxTimes[idx] / dataLength[idx];
+    AxXs[idx]->setRange(0, dataLength[idx]);
+    AxXs[idx]->setTickCount(dataLength[idx]+1);
+
+    updateAverage();
 }
 
 void Progress::changeLevel()
