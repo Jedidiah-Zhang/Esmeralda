@@ -3,7 +3,7 @@
 
 #include <QByteArray>
 
-#define BTNAME "HC-05"
+#define BTNAME "BlockCraft base"
 
 enum COMMANDS {
     STRUCT = 1,
