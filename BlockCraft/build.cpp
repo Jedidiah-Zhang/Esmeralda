@@ -127,7 +127,9 @@ void Build::failed()
     msg.exec();
 
     this->attempts += 1;
+    startTiming();
     finishBtn->show();
+    startBtn->hide();
 }
 
 void Build::startTiming()
@@ -148,6 +150,7 @@ void Build::resetTiming()
     this->timeTaken = 0;
     this->tmLbl->setStyleSheet("QLabel{color:black;}");
     this->startBtn->show();
+    this->finishBtn->hide();
     updateTime();
 }
 

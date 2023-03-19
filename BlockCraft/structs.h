@@ -3,6 +3,8 @@
 
 #include <QByteArray>
 
+#define BTNAME "HC-05"
+
 enum COMMANDS {
     STRUCT = 1,
     LED = 2,

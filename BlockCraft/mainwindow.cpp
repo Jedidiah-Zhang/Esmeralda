@@ -15,6 +15,8 @@ MainWindow::MainWindow(QWidget *parent)
     ui->setupUi(this);
     this->setWindowIcon(QIcon("://resources/images/blocks_icon.png"));
 
+    this->model = new Open3DModel;
+
     /*==========Scenes==========*/
     // set up all the scenes, and determine which scene is shown.
     // show only one scene at a time.
@@ -129,7 +131,7 @@ void MainWindow::toBuildScene(int lvl)
 {
     this->buildScene->setLevel(lvl);
     this->menuList->setCurrentIndex(BUILD);
-
+    this->model->run();
     this->blueTooth->sendStructure(this->levels->value(lvl));
 }
 
@@ -245,10 +247,12 @@ void MainWindow::updateRecordFiles(int idx, int curT, int useT, int Att)
     }
     this->levelSelectScene->setStarRecords(idx, minTime);
     this->progressScene->addPoint(idx, useT);
+    this->model->kill();
 }
 
 MainWindow::~MainWindow()
 {
     delete ui;
+    delete model;
 }
 

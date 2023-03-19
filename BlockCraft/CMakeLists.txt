@@ -32,6 +32,8 @@ set(PROJECT_SOURCES
     progress.cpp
     bluetooth.h
     bluetooth.cpp
+    open3dmodel.h
+    open3dmodel.cpp
     structs.h
     mainwindow.ui
     res.qrc

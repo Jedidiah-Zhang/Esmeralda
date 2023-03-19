@@ -89,6 +89,7 @@ void BlueTooth::BTReadData()
         emit ComfirmTrue();
         break;
     case COMFIRMF:
+        qDebug() << cmd;
         emit ComfirmFalse();
         break;
     default:

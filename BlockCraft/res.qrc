@@ -16,4 +16,10 @@
     <qresource prefix="/font">
         <file>resources/fonts/dearJoe5CASUAL-P.otf</file>
     </qresource>
+    <qresource prefix="/codes">
+        <file>bats/BlockPackageProcessing.bat</file>
+        <file>bats/Run3DRenderer.bat</file>
+        <file>PythonScripts/BluetoothModule.py</file>
+        <file>PythonScripts/QTProcessingRequests.py</file>
+    </qresource>
 </RCC>

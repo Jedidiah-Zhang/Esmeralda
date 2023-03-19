@@ -2,6 +2,7 @@
 #define MAINWINDOW_H
 
 #include "structs.h"
+#include "open3dmodel.h"
 #include "menu.h"
 #include "levelselect.h"
 #include "build.h"
@@ -44,6 +45,8 @@ private:
     virtual void resizeEvent(QResizeEvent *) override;
 
     Ui::MainWindow *ui;
+
+    Open3DModel *model = nullptr;
 
     QStackedWidget *menuList = nullptr;
     Menu *menuScene = nullptr;
