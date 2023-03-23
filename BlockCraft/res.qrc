@@ -1,8 +1,5 @@
 <RCC>
     <qresource prefix="/">
-        <file>resources/images/redButton.png</file>
-        <file>resources/images/yellowButton.png</file>
-        <file>resources/images/blueButton.png</file>
         <file>resources/images/startButton.png</file>
         <file>resources/images/back.png</file>
         <file>resources/images/defaultLevelBackground.png</file>
@@ -12,9 +9,6 @@
         <file>resources/images/blocks_icon.png</file>
         <file>resources/images/bluetooth.png</file>
         <file>resources/images/finishButton.png</file>
-    </qresource>
-    <qresource prefix="/font">
-        <file>resources/fonts/dearJoe5CASUAL-P.otf</file>
     </qresource>
     <qresource prefix="/codes">
         <file>bats/BlockPackageProcessing.bat</file>

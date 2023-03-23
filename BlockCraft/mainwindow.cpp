@@ -43,7 +43,7 @@ MainWindow::MainWindow(QWidget *parent)
     /*==========FileReading==========*/
     // load levels
     this->levels = new QMap<int, QVector<Block> *>;
-    QDir dirLevel("../BlockCraft/levels/");
+    QDir dirLevel("./levels/");
     dirLevel.setFilter(QDir::Files | QDir::NoSymLinks);
     QFileInfoList lvlList = dirLevel.entryInfoList();
     for (int i = 0; i < lvlList.count(); i++) {
@@ -55,7 +55,7 @@ MainWindow::MainWindow(QWidget *parent)
 
     // load records
     this->records = new QMap<int, QVector<Record> *>;
-    QDir dirRecord("../BlockCraft/records/");
+    QDir dirRecord("./records/");
     dirRecord.setFilter(QDir::Files | QDir::NoSymLinks);
     QFileInfoList rcdList = dirRecord.entryInfoList();
     // go through every file
@@ -232,7 +232,7 @@ void MainWindow::updateRecordFiles(int idx, int curT, int useT, int Att)
 
     QJsonDocument doc(obj);
     QByteArray data = doc.toJson();
-    QDir dir = QDir("../BlockCraft/records/");
+    QDir dir = QDir("./records/");
     if (!dir.exists()) dir.mkpath(".");
     QFile file(QString("%1/%2.json").arg(dir.absolutePath()).arg(idx));
     if (file.open(QIODevice::WriteOnly | QIODevice::Truncate)) {

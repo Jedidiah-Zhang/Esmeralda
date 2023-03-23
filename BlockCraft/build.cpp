@@ -52,15 +52,15 @@ Build::Build(QWidget *parent)
                 msg.setStandardButtons(QMessageBox::Yes | QMessageBox::Cancel);
                 msg.setDefaultButton(QMessageBox::Cancel);
                 switch (msg.exec()) {
-                    case QMessageBox::Yes:
-                        resetTiming();
-                        emit this->backButtonClicked();
-                        break;
-                    case QMessageBox::Cancel:
-                        startTiming();
-                        break;
-                    default:
-                        break;
+                case QMessageBox::Yes:
+                    resetTiming();
+                    emit this->backButtonClicked();
+                    break;
+                case QMessageBox::Cancel:
+                    startTiming();
+                    break;
+                default:
+                    break;
                 }
             } else {
                 resetTiming();
