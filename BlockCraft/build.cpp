@@ -175,11 +175,11 @@ void Build::updateTime()
     this->tmLbl->setText(time);
 }
 
-void Build::keyPressEvent(QKeyEvent *event)
-{
-    if (event->key() == Qt::Key_V) {
-        qDebug() << "Receive: 0x";
-        success();
-    }
-}
+//void Build::keyPressEvent(QKeyEvent *event)
+//{
+//    if (event->key() == Qt::Key_V) {
+//        qDebug() << "Receive: 0x";
+//        success();
+//    }
+//}
 

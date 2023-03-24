@@ -33,7 +33,7 @@ signals:
 
 private:
     void updateTime();
-    void keyPressEvent(QKeyEvent *event) override;
+//    void keyPressEvent(QKeyEvent *event) override;
 
     int levelIdx = 0;
     int timeTaken = 0;

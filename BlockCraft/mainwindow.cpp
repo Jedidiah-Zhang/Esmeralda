@@ -52,6 +52,7 @@ MainWindow::MainWindow(QWidget *parent)
         readLevelFile(info.absoluteFilePath(), info.baseName());
     }
     this->levelSelectScene->setLevels(this->levels->count());
+//    this->levelSelectScene->setLevels(2);
 
     // load records
     this->records = new QMap<int, QVector<Record> *>;

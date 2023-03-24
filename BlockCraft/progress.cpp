@@ -134,10 +134,10 @@ void Progress::updateAverage()
 void Progress::addPoint(int idx, int pt)
 {
     qDebug() << idx << pt;
-    this->lineSeries.value(idx)->append(dataLength[idx], pt);
+    this->lineSeries.value(idx)->append(dataLength[idx], pt/6000);
     if (pt > this->maxTimes[idx]) {
         this->maxTimes[idx] =  pt;
-        double maxMin = (double) pt / 6000;
+        double maxMin = (double)pt/6000;
         AxYs.value(idx)->setRange(0, maxMin+1);
     }
     dataLength[idx]++;
